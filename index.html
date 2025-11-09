@@ -35,29 +35,28 @@
     }
 
     body {
+      position: relative;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
-      body {
-  position: relative;
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
+    /* Background image layer */
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('bg.png') no-repeat center center/cover;
+      filter: grayscale(100%);
+      opacity: 0.5;
+      z-index: -1;
+    }
 
-/* Background image layer */
-body::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: url('bg.png') no-repeat center center/cover;
-  filter: grayscale(100%);
-  opacity: 0.5;
-  z-index: -1;
-}
-
+    body {
       background: radial-gradient(1200px 600px at 10% 10%, rgba(212, 175, 55, 0.06), transparent 6%),
                   radial-gradient(1000px 500px at 95% 90%, rgba(255, 204, 102, 0.04), transparent 8%),
                   var(--bg);
@@ -708,23 +707,30 @@ body::before {
       font-size: 16px;
     }
 
-    /* Table Number Input */
-    .table-number-section {
+    /* Customer Info Section (Updated from Table Number) */
+    .customer-info-section {
       margin-bottom: 20px;
       padding: 16px;
       background: rgba(255, 255, 255, 0.02);
       border-radius: 10px;
       border: 1px solid rgba(255, 255, 255, 0.03);
     }
-
-    .table-number-label {
+    
+    .customer-info-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    
+    .customer-info-label {
       display: block;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       font-weight: 600;
       color: var(--gold2);
+      font-size: 14px;
     }
-
-    .table-number-input {
+    
+    .customer-info-input {
       width: 100%;
       padding: 12px;
       border-radius: 8px;
@@ -733,8 +739,8 @@ body::before {
       color: white;
       font-size: 16px;
     }
-
-    .table-number-input:focus {
+    
+    .customer-info-input:focus {
       outline: none;
       border-color: var(--gold2);
     }
@@ -775,8 +781,6 @@ body::before {
     .site-logo {
       width: 200px;
       height: 200px;
-
-      
       object-fit: contain;
       margin-left: 10px;
       border-radius: 8px; /* make corners slightly round */
@@ -829,6 +833,10 @@ body::before {
       
       .cart-actions {
         flex-direction: row;
+      }
+      
+      .customer-info-grid {
+        grid-template-columns: 1fr 1fr;
       }
     }
 
@@ -920,10 +928,18 @@ body::before {
         <button class="close-cart" id="closeCart">&times;</button>
       </div>
       
-      <!-- Table Number Input Section -->
-      <div class="table-number-section">
-        <label for="tableNumber" class="table-number-label">Enter Table Number</label>
-        <input type="text" id="tableNumber" class="table-number-input" placeholder="e.g., Table 5" />
+      <!-- Customer Info Section (Updated from Table Number) -->
+      <div class="customer-info-section">
+        <div class="customer-info-grid">
+          <div>
+            <label for="customerName" class="customer-info-label">Your Name</label>
+            <input type="text" id="customerName" class="customer-info-input" placeholder="Enter your name" />
+          </div>
+          <div>
+            <label for="customerMobile" class="customer-info-label">Mobile Number</label>
+            <input type="tel" id="customerMobile" class="customer-info-input" placeholder="Enter your mobile number" />
+          </div>
+        </div>
       </div>
       
       <div class="cart-items" id="cartItems">
@@ -1008,7 +1024,6 @@ body::before {
     const cartTotal = document.getElementById('cartTotal');
     const clearCart = document.getElementById('clearCart');
     const whatsappOrder = document.getElementById('whatsappOrder');
-    const tableNumberInput = document.getElementById('tableNumber');
 
     // Toggle cart modal
     cartButton.addEventListener('click', () => {
@@ -1121,20 +1136,36 @@ body::before {
       updateCart();
     });
 
-    // WhatsApp order function
+    // WhatsApp order function (Updated to include customer info)
     whatsappOrder.addEventListener('click', () => {
       if (cart.length === 0) {
         alert('Your cart is empty!');
         return;
       }
       
-      const tableNumber = tableNumberInput.value.trim();
-      if (!tableNumber) {
-        alert('Please enter your table number');
+      const customerName = document.getElementById('customerName').value.trim();
+      const customerMobile = document.getElementById('customerMobile').value.trim();
+      
+      if (!customerName) {
+        alert('Please enter your name');
         return;
       }
       
-      let message = `Hello! I would like to place an order from Table: ${tableNumber}:\n\n`;
+      if (!customerMobile) {
+        alert('Please enter your mobile number');
+        return;
+      }
+      
+      // Validate mobile number (basic validation)
+      if (!/^\d{10}$/.test(customerMobile)) {
+        alert('Please enter a valid 10-digit mobile number');
+        return;
+      }
+      
+      let message = `Hello! I would like to place an order:\n\n`;
+      message += `Customer Name: ${customerName}\n`;
+      message += `Mobile Number: ${customerMobile}\n\n`;
+      message += `Order Details:\n`;
       
       cart.forEach(item => {
         message += `${item.name} - ${item.quantity} x ${item.price}\n`;
@@ -1232,13 +1263,3 @@ body::before {
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
